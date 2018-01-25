@@ -86,12 +86,72 @@
 <body>
 	<div class="box">
 		<h5>Promise的含义</h5>
-		<pre>Promise在Javascript语言中早有实现，ES6(ES2015)才将其进行标准统一化，提供了Promise对象。Promise是用来传递异步操作的信息，避免了异步回调的层层嵌套问题。</pre>
+		<pre>Promise在Javascript语言中早有实现，ES6(ES2015)才将其进行标准统一化，提供了Promise对象。Promise是用来传递异步操作的信息，避免了异步回调的层层嵌套问题。Promise对象能够将异步的操作以同步操作的流程表达出来。</pre>
 		<h5>Promise的三大状态</h5>
 		<pre class="brush:js;">
 			1、Pending: 进行中
 			2、Resolved: 已完成
 			3、Rejected：已失败
+		</pre>
+		<h5>Promise的两大特点</h5>
+		<pre>1、对象状态不受外界干扰。</pre>
+		<pre>2、一旦状态改变就不会再变。</pre>
+		<h5>Promise的基本用法</h5>
+		<pre class="brush:js;">
+			var promise = new Promise(function(resolve,reject){
+				// 代码片段
+
+				if(/**异步操作成功**/)
+				{
+					resolve(value);
+				}else{
+					reject(error);
+				}
+			});
+
+			//回调控制
+			promise.then(function(value){
+				//success
+			},function(value){
+				//failure
+			});
+		</pre>
+		<pre>Promise的构造函数接受的是一个匿名函数，这个匿名函数接受两个参数resolve和reject，这两个参数是两个函数，有Javascript引擎提供，不用我们自己部署的。Promise实例生成后可以用then方法分别指定Resolved状态和Rejected状态的回调函数</pre>
+		<h5>Promise运用到getJSON内的实例</h5>
+		<pre class="brush:js;">
+			var getJSON = function(url){
+				var promise = new Promise(function(resolve,reject){
+					var client = new XMLHttpRequest(); //创建实例
+					client.open("GET",url);//打开一个连接
+					client.onreadystatechange = handler;
+					client.responseType  = "json";
+					client.setRequestHeader("Accept","application/json");
+					client.send();//发送请求
+
+					function handler(){
+						if(this.readyState != 4)
+						{
+							return;
+						}
+						if(this.readyState == 200)
+						{
+							resolve(this.response);							
+						}else{
+							reject(new Error(this.statusText));
+						}
+					}
+				});
+				return promise;
+			}
+
+			//调用getJSON
+			getJSON("/api/getuser").then(function(json){
+				//ajax成功
+				console.log("成功了，内容返回:",json);
+			},function(error){
+				//失败了
+				console.error("出错了",error);
+			});
 		</pre>
 	</div>
 	<script type="text/javascript">
